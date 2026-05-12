@@ -1,0 +1,32 @@
+{
+  "name": "biblioteca-ucaldas-api",
+  "version": "1.0.0",
+  "description": "API REST en memoria para gestionar prestamos de libros de una biblioteca universitaria.",
+  "main": "dist/src/server.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc",
+    "start": "node dist/src/server.js",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "express": "^4.18.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.30",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4",
+    "ts-jest": "^29.1.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

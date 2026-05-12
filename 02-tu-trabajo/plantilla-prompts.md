@@ -6,13 +6,13 @@
 
 ## Prompt #[número]
 
-**Fecha y hora:** [YYYY-MM-DD HH:MM]
+**Fecha y hora:** [YYYY-MM-DD HH:MM] con time zone de Colombia :D
 
 **Propósito en una línea:** [Por ejemplo: "Generar la estructura inicial del proyecto" o "Corregir la validación de fechas en el endpoint POST /prestamos"]
 
 **Etapa del taller:** [1 / 2 / 3 / 4 / 5]
 
-**IA usada:** [Claude Code / Cursor / Copilot Workspace / ChatGPT / etc.]
+**IA usada:** [Claude Code / Cursor / Copilot Workspace / ChatGPT / Codex / etc.]
 
 ---
 
@@ -34,6 +34,7 @@
 - Si dijo "todo está funcionando" o si admitió alguna limitación.
 
 Ejemplo:
+
 > Creó 3 archivos: app.js, modelos/prestamo.js, rutas/prestamos.js. Instaló express y body-parser. Tomó la decisión de usar moment.js para manejar fechas (no se lo pedí). Dijo que todo está funcionando.]
 
 ---
