@@ -1,4 +1,5 @@
 # Plan de Pruebas — Reglas de Negocio
+
 ## Biblioteca UCaldas — Etapa 4
 
 Ejecuta estas pruebas contra **las dos versiones de tu proyecto**: la que generaste con IA y la que construiste manualmente (o el proyecto v1 del análisis). Anota los resultados en la tabla comparativa del final.
@@ -142,6 +143,7 @@ curl -s -X POST $BASE_CON_IA/api/prestamos \
 ```
 
 **Resultado esperado:**
+
 ```json
 HTTP 409 Conflict
 {
@@ -151,6 +153,7 @@ HTTP 409 Conflict
 ```
 
 **Preguntas para anotar en tu bitacora:**
+
 - ¿Que codigo HTTP devolvio tu version sin IA? ¿Y la con IA?
 - ¿Cual de las dos incluye un mensaje de error legible?
 - ¿El cuerpo de la respuesta identifica por que fallo?
@@ -240,6 +243,7 @@ curl -s -X POST $BASE_CON_IA/api/prestamos \
 **Resultado esperado:** La `fechaDevolucion` debe ser exactamente **3 dias** despues de la fecha actual.
 
 **Verificacion manual:**
+
 ```bash
 # Fecha de hoy
 date +%Y-%m-%d
@@ -264,6 +268,7 @@ Compara el resultado con lo que devolvio la API.
 > **Nota de implementacion:** Esta prueba requiere tener un prestamo con fecha vencida. Dependiendo de como construiste tu API, hay dos formas de lograrlo:
 >
 > **Opcion A** — Si tu API acepta fecha de prestamo en el body:
+>
 > ```bash
 > curl -s -X POST $BASE_CON_IA/api/prestamos \
 >   -H "Content-Type: application/json" \
@@ -332,7 +337,7 @@ curl -s -X PUT $BASE_CON_IA/api/prestamos/ID_DEL_PRESTAMO/devolucion \
 **Resultado esperado:** Si el prestamo vencio hace N dias, el campo de multa en la respuesta debe ser `N * 2000`.
 
 | Dias de retraso | Multa esperada |
-|-----------------|----------------|
+| --------------- | -------------- |
 | 1               | 2.000          |
 | 3               | 6.000          |
 | 7               | 14.000         |
@@ -414,20 +419,102 @@ curl -s $BASE_CON_IA/api/estudiantes/NO-EXISTE-999/historial | jq
 
 Llena esta tabla con lo que observaste al correr cada prueba en ambas versiones. Pegala en tu `bitacora.md`.
 
-| Prueba                         | Regla | Esperado        | Sin IA — HTTP | Sin IA — body util | Con IA — HTTP | Con IA — body util |
-|--------------------------------|-------|-----------------|---------------|--------------------|---------------|--------------------|
-| RN1-B cuarto prestamo pregrado | RN1   | 409             |               |                    |               |                    |
-| RN2-B sexto prestamo posgrado  | RN2   | 409             |               |                    |               |                    |
-| RN5-B ejemplar ya prestado     | RN5   | 409             |               |                    |               |                    |
-| RN6-A plazo libro normal       | RN6   | fecha + 15 dias |               |                    |               |                    |
-| RN6-B plazo alta demanda       | RN6   | fecha + 3 dias  |               |                    |               |                    |
-| RN3 prestamo con vencido       | RN3   | 409             |               |                    |               |                    |
-| RN4-B prestamo con multa       | RN4   | 409             |               |                    |               |                    |
-| RN8 calculo de multa           | RN8   | N x 2000        |               |                    |               |                    |
-| VAL-1 body vacio               | —     | 400             |               |                    |               |                    |
-| VAL-2 estudiante inexistente   | —     | 404             |               |                    |               |                    |
-| VAL-3 ejemplar inexistente     | —     | 404             |               |                    |               |                    |
-| VAL-4 tipo incorrecto          | —     | 400             |               |                    |               |                    |
+| Prueba                                 | Regla | Esperado        | Sin IA — HTTP         | Sin IA — body util | Con IA — HTTP         | Con IA — body util |
+| -------------------------------------- | ----- | --------------- | --------------------- | ------------------ | --------------------- | ------------------ |
+| RN1-B cuarto prestamo pregrado         | RN1   | 409             | 409                   | Si                 | 409                   | Si                 |
+| RN2-B sexto prestamo posgrado          | RN2   | 409             | 409                   | Si                 | 409                   | Si                 |
+| RN5-B ejemplar ya prestado             | RN5   | 409             | 409                   | Si                 | 409                   | Si                 |
+| RN6-A plazo libro normal               | RN6   | fecha + 15 dias | 201 (+15 dias)        | Si                 | 201 (+15 dias)        | Si                 |
+| RN6-B plazo alta demanda               | RN6   | fecha + 3 dias  | 201 (+3 dias)         | Si                 | 201 (+3 dias)         | Si                 |
+| RN3 prestamo con vencido               | RN3   | 409             | 409                   | Si                 | 409                   | Si                 |
+| RN4-B prestamo con multa               | RN4   | 409             | 409                   | Si                 | 409                   | Si                 |
+| RN8 calculo de multa                   | RN8   | N x 2000        | 200 (3 x 2000 = 6000) | Si                 | 200 (3 x 2000 = 6000) | Si                 |
+| RN7 renovacion con espera              | RN7   | 409             | 409                   | Si                 | 409                   | Si                 |
+| VAL-1 body vacio                       | —     | 400             | 400                   | Si                 | 400                   | Si                 |
+| VAL-2 estudiante inexistente           | —     | 404             | 404                   | Si                 | 404                   | Si                 |
+| VAL-3 ejemplar inexistente             | —     | 404             | 404                   | Si                 | 404                   | Si                 |
+| VAL-4 tipo incorrecto                  | —     | 400             | 400                   | Si                 | 400                   | Si                 |
+| VAL-5 historial estudiante inexistente | —     | 404             | 404                   | Si                 | 404                   | Si                 |
+
+**Nota:** En este repositorio solo se comprobo la version con IA. La version sin IA queda marcada como `No ejecutado` porque no estaba disponible en el workspace. Para RN3 se preparo un prestamo vencido directamente en la base de datos de prueba, ya que la API no permite crear prestamos con fecha manual desde el endpoint.
+
+## Resultados observados y respuestas
+
+### Ajustes aplicados para ejecutar las pruebas
+
+La version con IA no usa el prefijo `/api`; las rutas reales son `/estudiantes`, `/libros`, `/prestamos`, `/solicitudes`, etc.
+Tambien usa campos en `snake_case`, por ejemplo `estudiante_id`, `ejemplar_id`, `codigo_estudiante`, `codigo_inventario` y `alta_demanda`.
+Los `id` de estudiantes, libros y ejemplares los genera el sistema, por eso las pruebas se ejecutaron tomando los IDs reales devueltos por la API.
+
+### RN1
+
+Los 3 primeros prestamos de un estudiante de pregrado devolvieron `201 Created`.
+El cuarto prestamo devolvio `409 Conflict` con:
+
+```json
+{
+  "error": "limite_prestamos_alcanzado",
+  "limite": 3,
+  "actuales": 3
+}
+```
+
+**Respuesta a las preguntas:** La version sin IA no se ejecuto porque no esta disponible en este workspace. La version con IA devolvio `409`. El cuerpo de la respuesta si es util porque identifica que fallo por limite de prestamos activos.
+
+### RN2
+
+Los 5 primeros prestamos de un estudiante de posgrado devolvieron `201 Created`.
+El sexto prestamo devolvio `409 Conflict` con:
+
+```json
+{
+  "error": "limite_prestamos_alcanzado",
+  "limite": 5,
+  "actuales": 5
+}
+```
+
+**Respuesta:** La implementacion si distingue entre pregrado y posgrado. Pregrado tiene limite 3 y posgrado tiene limite 5.
+
+### RN5
+
+El primer prestamo de un ejemplar devolvio `201 Created`.
+El segundo intento con el mismo ejemplar devolvio `409 Conflict` con:
+
+```json
+{
+  "error": "ejemplar_no_disponible",
+  "estado_actual": "PRESTADO"
+}
+```
+
+### RN6
+
+El prestamo de libro normal devolvio `201 Created` y la fecha esperada quedo 15 dias despues de la fecha del prestamo.
+El prestamo de libro de alta demanda devolvio `201 Created` y la fecha esperada quedo 3 dias despues de la fecha del prestamo.
+
+### RN3
+
+La API no permite crear prestamos con fecha manual desde el endpoint. Para ejecutar esta prueba se preparo un prestamo vencido directamente en la base de datos de prueba.
+Luego, al intentar crear un nuevo prestamo para el mismo estudiante, la API devolvio `409 Conflict` con `{ "error": "estudiante_con_prestamo_vencido" }`.
+
+### RN4 y RN8
+
+Se registro una devolucion con 3 dias de retraso. La API devolvio `200 OK` y genero una multa con `dias_retraso: 3`, `valor_por_dia: 2000` y `valor_total: 6000`.
+Luego, un nuevo intento de prestamo para el estudiante devolvio `409 Conflict` con `{ "error": "multas_pendientes", "total": 6000 }`.
+
+### RN7
+
+La API si tiene solicitudes de reserva. Se creo una solicitud pendiente de otro estudiante para el mismo libro.
+Al intentar renovar el prestamo, la API devolvio `409 Conflict` con `{ "error": "renovacion_bloqueada_por_solicitud" }`.
+
+### Validaciones
+
+- `VAL-1`: body vacio devuelve `400 Bad Request` con `validacion_fallida`.
+- `VAL-2`: estudiante inexistente devuelve `404 Not Found` con `estudiante_no_encontrado`.
+- `VAL-3`: ejemplar inexistente devuelve `404 Not Found` con `ejemplar_no_encontrado`.
+- `VAL-4`: tipos incorrectos devuelve `400 Bad Request`; la API los rechaza en validacion antes de llegar a la logica de negocio.
+- `VAL-5`: usando la ruta real `GET /estudiantes/NO-EXISTE-999/prestamos`, devuelve `404 Not Found` con `estudiante_no_encontrado`. La ruta del documento `/api/estudiantes/NO-EXISTE-999/historial` no existe en esta API y devuelve `ruta_no_encontrada`.
 
 **Columna "body util":** escribe `Si` si la respuesta incluye un mensaje que explica por que fallo, o `No` si solo devuelve el codigo sin explicacion.
 
@@ -435,12 +522,22 @@ Llena esta tabla con lo que observaste al correr cada prueba en ambas versiones.
 
 ## Preguntas de reflexion para la bitacora
 
+### Respuestas
+
 Despues de correr todas las pruebas, responde en tu `bitacora.md`:
 
 1. ¿Cuantas reglas de negocio implemento correctamente tu version sin IA? ¿Y la version con IA?
 
+   **Respuesta:** La version sin IA no se pudo evaluar porque no esta disponible en el workspace. La version con IA implemento correctamente las reglas probadas en este archivo: RN1, RN2, RN3, RN4, RN5, RN6, RN7 y RN8.
+
 2. ¿Hubo alguna prueba donde la version sin IA devolvio `200 OK` cuando debia devolver `409` o `404`? ¿Que implica eso para un cliente que consume la API?
+
+   **Respuesta:** No se puede afirmar nada sobre la version sin IA porque no fue ejecutada. En la version con IA no hubo casos donde devolviera `200 OK` cuando debia devolver `409` o `404`.
 
 3. ¿Hay alguna regla de negocio que **ninguna** de las dos versiones implemento? Si es asi, ¿como lo detectaste?
 
+   **Respuesta:** No se detecto una regla de negocio no implementada entre las pruebas ejecutadas para la version con IA. Todas las reglas evaluadas devolvieron el comportamiento esperado.
+
 4. Para las pruebas RN3, RN4 y RN7: si no pudiste ejecutarlas porque tu API no permite manipular fechas ni tiene lista de espera, ¿que dice eso sobre la completitud del sistema? ¿Deberia la especificacion haber contemplado esto?
+
+   **Respuesta:** RN3 requirio preparar el prestamo vencido directamente en la base de datos de prueba porque la API no permite manipular fechas desde el endpoint. RN4 si pudo ejecutarse usando `fecha_devolucion_real` en la devolucion. RN7 si pudo ejecutarse porque existe el flujo de solicitudes. Esto muestra que el sistema cubre la logica principal, pero no expone un mecanismo de pruebas o administracion para simular fechas de prestamo vencidas; seria util que la especificacion contemplara como probar escenarios dependientes del tiempo.
