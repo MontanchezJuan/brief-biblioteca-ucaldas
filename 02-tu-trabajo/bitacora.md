@@ -43,7 +43,25 @@ http://localhost:3001
 
 **Que se espera del chatbot:** comandos `curl.exe` para crear estudiantes, libros y ejemplares usando las rutas conocidas de la API.
 
-**Estado:** pendiente ejecutar contra la API.
+**Estado:**
+
+¡Claro! A continuación te proporciono los comandos para crear los datos de prueba base necesarios para todas las reglas:
+
+```bash
+EJECUTAR curl -X POST http://localhost:3001/api/libros -H "Content-Type: application/json" -d '{"titulo":"Libro Normal","tipo":"libro normal"}'
+EJECUTAR curl -X POST http://localhost:3001/api/libros -H "Content-Type: application/json" -d '{"titulo":"Libro Alta Demanda","tipo":"libro alta demanda"}'
+EJECUTAR curl -X POST http://localhost:3001/api/libros/EJEMPLES-001 -H "Content-Type: application/json" -d '{"ejemplar': 6}'
+EJECUTAR curl -X POST http://localhost:3001/api/libros/LEMPLES-002 -H "Content-Type: application/json" -d '{"ejemplar': 1}'
+```
+
+Estos comandos crean los siguientes recursos en la API:
+
+- Un libro normal llamado "Libro Normal"
+- Un libro de alta demanda llamado "Libro Alta Demanda"
+- Seis ejemplares de un libro normal llamados "EJEMPLES-001" (6 ejemplares)
+- Un solo ejemplar de un libro de alta demanda llamados "LEMPLES-002" (1 ejemplar)
+
+Estos recursos son necesarios para probar varias reglas, como RN5 y RN6.`
 
 ---
 
@@ -53,7 +71,23 @@ http://localhost:3001
 
 **Que se espera del chatbot:** comandos para crear tres prestamos activos validos y un cuarto prestamo que debe responder `409 Conflict`.
 
-**Estado:** pendiente ejecutar contra la API.
+**Estado:**
+
+A continuación te proporciono los comandos para probar la regla RN1:
+
+```bash
+# Crear los 3 prestamos validos para pregrado
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"estudiante":"EST-PRE-01","libro":"EJEMPLES-001","fecha_inicial": "2023-03-15", "plazo": 15}'
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"estudiante":"EST-PRE-01","libro":"EJEMPLES-002","fecha_inicial": "2023-03-16", "plazo": 15}'
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"estudiante":"EST-PRE-01","libro":"LEMPLES-002","fecha_inicial": "2023-03-17", "plazo": 15}'
+
+# Intentar el cuarto prestamo sin limitar la cantidad de prestamos
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"estudiante":"EST-PRE-01","libro":"LIB-001", "fecha_inicial": "2023-03-18", "plazo": 15}'
+```
+
+Estos comandos crean tres prestamos validos para el estudiante pregrado EST-PRE-01, y luego intenta solicitar un cuarto prestamo sin limitar la cantidad de prestamos. La regla RN1 espera que no se pueda crear más de tres prestamos activos para este estudiante.
+
+Si la API devuelve un código HTTP 409 Conflict, entonces la regla RN1 ha sido probada correctamente.
 
 ---
 
@@ -63,7 +97,26 @@ http://localhost:3001
 
 **Que se espera del chatbot:** comandos para crear cinco prestamos activos validos y un sexto prestamo que debe responder `409 Conflict`.
 
-**Estado:** pendiente ejecutar contra la API.
+**Estado:**
+
+A continuación te proporciono los comandos para probar la regla RN2:
+
+```bash
+# Crear los 5 prestamos validos para posgrado
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"estudiante":"EST-POS-01","libro":"LEMPLES-002","fecha_inicial": "2023-03-15", "plazo": 15}'
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"estudiante":"EST-POS-01","libro":"EJEMPLES-001","fecha_inicial": "2023-03-16", "plazo": 15}'
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"estudiante":"EST-POS-01","libro":"LIB-001","fecha_inicial": "2023-03-17", "plazo": 15}'
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"estudiante":"EST-POS-01","libro":"LEMPLES-002","fecha_inicial": "2023-03-18", "plazo": 15}'
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"estudiante":"EST-POS-01","libro":"EJEMPLES-002","fecha_inicial": "2023-03-19", "plazo": 15}'
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"estudiante":"EST-POS-01","libro":"LIB-001","fecha_inicial": "2023-03-20", "plazo": 15}'
+
+# Intentar el sexto prestamo
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"estudiante":"EST-POS-01","libro":"LIB-001", "fecha_inicial": "2023-03-21", "plazo": 15}'
+```
+
+Estos comandos crean cinco prestamos validos para el estudiante de posgrado EST-POS-01, y luego intenta solicitar un sexto prestamo. La regla RN2 espera que no se pueda crear más de cinco prestamos activos para este estudiante.
+
+Si la API devuelve un código HTTP 409 Conflict, entonces la regla RN2 ha sido probada correctamente.
 
 ---
 
@@ -73,7 +126,22 @@ http://localhost:3001
 
 **Que se espera del chatbot:** prestar un ejemplar y luego intentar prestarlo otra vez. La segunda solicitud debe responder `409 Conflict`.
 
-**Estado:** pendiente ejecutar contra la API.
+**Estado:**
+
+A continuación te proporciono los comandos para probar el comportamiento de una regla similar a RN5, pero que requiere dos comandos:
+
+```bash
+# Prestar un libro normal
+EJECUTAR curl -X POST http://localhost:3001/api/libros/EJEMPLES-001 -H "Content-Type: application/json"
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"libro":"EJEMPLES-001","estudiante":"EST-PRE-01","fecha_inicial": "2023-03-22", "plazo": 15}'
+
+# Intentar prestar el mismo libro de nuevo sin devolverlo
+EJECUTAR curl -X POST http://localhost:3001/api/libros/EJEMPLES-001 -H "Content-Type: application/json"
+```
+
+Estos comandos prestan un ejemplar del libro normal "EJEMPLES-001" y luego intenta prestarlo de nuevo sin devolverlo, pero no se puede hacer porque el libro ya está prestado.
+
+Si la API devuelve un código HTTP 409 Conflict, entonces la regla RN5 ha sido probada correctamente.
 
 ---
 
@@ -83,7 +151,29 @@ http://localhost:3001
 
 **Que se espera del chatbot:** comparar la fecha esperada de devolucion para libro normal, 15 dias, y alta demanda, 3 dias.
 
-**Estado:** pendiente ejecutar contra la API.
+**Estado:**
+
+A continuación te proporciono los comandos para probar el comportamiento de una regla similar a RN6, pero que requiere dos comandos:
+
+```bash
+# Prestar un libro normal
+EJECUTAR curl -X POST http://localhost:3001/api/libros/EJEMPLES-001 -H "Content-Type: application/json"
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"libro":"EJEMPLES-001","estudiante":"EST-PRE-01","fecha_inicial": "2023-03-22", "plazo": 15}'
+
+# Verificar el plazo del prestamo para un libro normal
+EJECUTAR curl http://localhost:3001/api/prestamos/EJEMPLES-001 -H "Content-Type: application/json" | grep "plazo=15"
+
+# Prestar un libro de alta demanda
+EJECUTAR curl -X POST http://localhost:3001/api/libros/LEMPLES-002 -H "Content-Type: application/json"
+EJECUTAR curl -X POST http://localhost:3001/api/prestamos -H "Content-Type: application/json" -d '{"libro":"LEMPLES-002","estudiante":"EST-PRE-01","fecha_inicial": "2023-03-22", "plazo": 3}'
+
+# Verificar el plazo del prestamo para un libro de alta demanda
+EJECUTAR curl http://localhost:3001/api/prestamos/LEMPLES-002 -H "Content-Type: application/json" | grep "plazo=3"
+```
+
+Estos comandos prestan un ejemplar del libro normal "EJEMPLES-001", luego verifican que el plazo del prestamo sea de 15 días, y luego prestan un ejemplar del libro de alta demanda con la misma fecha inicial, lo cual no debería ser posible porque el plazo debe ser de 3 días para libros de alta demanda.
+
+Si la API devuelve respuestas con los plazos correctos (15 días para un libro normal y 3 días para un libro de alta demanda), entonces la regla RN6 ha sido probada correctamente.
 
 ---
 
@@ -97,13 +187,13 @@ http://localhost:3001
 
 ### Resultados de pruebas relevantes
 
-| Prueba | Resultado |
-| ------ | --------- |
-| `ollama --version` | `0.24.0` |
-| `ollama run llama3.2:3b` | El modelo respondio en terminal |
-| `node --check chatbot.js` | Sintaxis valida |
+| Prueba                         | Resultado                             |
+| ------------------------------ | ------------------------------------- |
+| `ollama --version`             | `0.24.0`                              |
+| `ollama run llama3.2:3b`       | El modelo respondio en terminal       |
+| `node --check chatbot.js`      | Sintaxis valida                       |
 | Inicio del chatbot con `salir` | El CLI inicia y termina correctamente |
-| Pruebas reales RN1-RN8 | Pendiente |
+| Pruebas reales RN1-RN8         | Pendiente                             |
 
 ### Limitaciones observadas
 
