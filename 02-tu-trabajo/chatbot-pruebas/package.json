@@ -1,0 +1,16 @@
+{
+  "name": "chatbot-pruebas",
+  "version": "1.0.0",
+  "description": "Chatbot CLI de pruebas con Ollama para la API Biblioteca UCaldas.",
+  "main": "chatbot.js",
+  "scripts": {
+    "start": "node chatbot.js",
+    "check": "node --check chatbot.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
