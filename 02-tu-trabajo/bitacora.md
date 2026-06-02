@@ -4,49 +4,122 @@
 
 ### Modelo usado
 
-- Nombre del modelo: llama3.2:3b
-- Version de Ollama: 0.24.0
-- API probada: http://localhost:3001
+- Nombre: `llama3.2:3b`
+- Version de Ollama: `0.24.0`
+- API objetivo: `http://localhost:3001`
 - Ollama instalado: Si
-- Comando usado para verificar version: ollama --version
-- Resultado: 0.24.0
-- Modelo instalado: llama3.2:3b
+- Modelo instalado: Si
 - El modelo respondio en terminal: Si
-- RAM consumida aproximada: Pendiente de medir durante ejecucion real.
+- RAM consumida aproximada: pendiente de medir durante una sesion real.
 
 ### Verificacion inicial
 
-- Ollama fue verificado localmente antes de implementar el chatbot.
-- El modelo llama3.2:3b fue ejecutado con `ollama run llama3.2:3b`.
-- El chatbot debe ejecutarse desde `02-tu-trabajo/chatbot-pruebas`.
-- Para iniciar Ollama: `ollama serve`.
-- Para iniciar el chatbot: `node chatbot.js` o `npm start`.
-- La API de Biblioteca UCaldas debe estar corriendo en `http://localhost:3001`.
+Antes de construir el chatbot ya se habia confirmado lo siguiente:
 
-### Preguntas utiles que genero el chatbot
+- Comando para verificar Ollama: `ollama --version`
+- Resultado: `0.24.0`
+- Comando usado para probar el modelo: `ollama run llama3.2:3b`
+- Resultado: el modelo permitio entablar una conversacion correctamente.
 
-| Pregunta que hice                                               | Que genero el chatbot                     | Fue util? |
-| --------------------------------------------------------------- | ----------------------------------------- | --------- |
-| Pendiente de ejecutar: crea datos base para RN1-RN8             | Pendiente de registrar comandos generados | Pendiente |
-| Pendiente de ejecutar: prueba RN1 para limite de pregrado       | Pendiente de registrar resultado          | Pendiente |
-| Pendiente de ejecutar: prueba RN6 para plazos por tipo de libro | Pendiente de registrar resultado          | Pendiente |
+Para usar el chatbot se debe iniciar Ollama y luego ejecutar el script:
 
-### Limitaciones observadas
+```powershell
+ollama serve
+cd 02-tu-trabajo/chatbot-pruebas
+node chatbot.js
+```
 
-- Pendiente validar si llama3.2:3b genera siempre comandos `curl.exe` con el formato esperado.
-- Pendiente validar si el modelo respeta todos los endpoints conocidos sin inventar rutas.
-- Pendiente validar si el modelo mantiene contexto suficiente para sesiones largas de pruebas.
+La API de Biblioteca UCaldas debe estar corriendo en:
+
+```text
+http://localhost:3001
+```
+
+### Preguntas utiles para el chatbot
+
+#### Pregunta 1 - Datos base
+
+**Pregunta:** crea los datos de prueba base para todas las reglas: un estudiante pregrado EST-PRE-01, uno posgrado EST-POS-01, un libro normal LIB-001 con 6 ejemplares y un libro de alta demanda LIB-002 con 1 ejemplar.
+
+**Que se espera del chatbot:** comandos `curl.exe` para crear estudiantes, libros y ejemplares usando las rutas conocidas de la API.
+
+**Estado:** pendiente ejecutar contra la API.
+
+---
+
+#### Pregunta 2 - RN1
+
+**Pregunta:** genera la prueba RN1 completa: crear los 3 prestamos validos para pregrado y luego intentar el cuarto.
+
+**Que se espera del chatbot:** comandos para crear tres prestamos activos validos y un cuarto prestamo que debe responder `409 Conflict`.
+
+**Estado:** pendiente ejecutar contra la API.
+
+---
+
+#### Pregunta 3 - RN2
+
+**Pregunta:** ahora haz lo mismo para RN2 con el estudiante de posgrado, recuerda que su limite es 5.
+
+**Que se espera del chatbot:** comandos para crear cinco prestamos activos validos y un sexto prestamo que debe responder `409 Conflict`.
+
+**Estado:** pendiente ejecutar contra la API.
+
+---
+
+#### Pregunta 4 - RN5
+
+**Pregunta:** prueba que un ejemplar ya prestado no se puede prestar de nuevo.
+
+**Que se espera del chatbot:** prestar un ejemplar y luego intentar prestarlo otra vez. La segunda solicitud debe responder `409 Conflict`.
+
+**Estado:** pendiente ejecutar contra la API.
+
+---
+
+#### Pregunta 5 - RN6
+
+**Pregunta:** muestrame como verificar que el plazo del prestamo es correcto para un libro normal versus uno de alta demanda.
+
+**Que se espera del chatbot:** comparar la fecha esperada de devolucion para libro normal, 15 dias, y alta demanda, 3 dias.
+
+**Estado:** pendiente ejecutar contra la API.
+
+---
+
+#### Pregunta 6 - Entradas invalidas
+
+**Pregunta:** genera pruebas de entradas invalidas: body vacio, estudiante inexistente y ejemplar inexistente.
+
+**Que se espera del chatbot:** comandos `curl.exe` con casos negativos y explicacion breve de los codigos esperados, por ejemplo `400` o `404` segun la validacion de la API.
+
+**Estado:** pendiente ejecutar contra la API.
 
 ### Resultados de pruebas relevantes
 
-- Instalacion de Ollama: completada previamente.
-- Verificacion de version: `ollama --version` devolvio `0.24.0`.
-- Instalacion y prueba del modelo: `llama3.2:3b` respondio en terminal.
-- Ejecucion real de pruebas contra `http://localhost:3001`: pendiente.
-- Validacion de RN1-RN8 con respuestas reales de la API: pendiente.
+| Prueba | Resultado |
+| ------ | --------- |
+| `ollama --version` | `0.24.0` |
+| `ollama run llama3.2:3b` | El modelo respondio en terminal |
+| `node --check chatbot.js` | Sintaxis valida |
+| Inicio del chatbot con `salir` | El CLI inicia y termina correctamente |
+| Pruebas reales RN1-RN8 | Pendiente |
 
-### Comparacion entre chatbot local y modelos en la nube
+### Limitaciones observadas
 
-- Chatbot local con Ollama: no envia datos a servicios externos y permite trabajar sin APIs en la nube.
-- Chatbot local con llama3.2:3b: puede ser suficiente para generar comandos y guiar pruebas, pero requiere validacion manual de rutas, bodies y resultados.
-- Modelos en la nube: suelen tener mayor capacidad de razonamiento y consistencia, pero implican enviar contexto fuera del entorno local y dependen de conectividad externa.
+- Todavia falta ejecutar los comandos reales contra `http://localhost:3001`.
+- El modelo `llama3.2:3b` puede generar respuestas mas simples que modelos mas grandes.
+- Si no se le insiste en usar `curl.exe`, podria responder con explicaciones en vez de comandos ejecutables.
+- Hay que revisar que no invente rutas fuera de los endpoints definidos en el system prompt.
+- Los resultados de negocio, como `409 Conflict`, deben verificarse con la API real.
+
+### Comparacion: chatbot local vs modelos en la nube
+
+- El chatbot local protege mejor el contexto del proyecto porque no envia informacion a servicios externos.
+- La configuracion con Ollama permite repetir pruebas sin depender de creditos ni APIs en la nube.
+- Un modelo en la nube probablemente tendria respuestas mas completas y consistentes.
+- Para este taller, el chatbot local es suficiente porque el objetivo es generar y ejecutar pruebas guiadas sobre una API local.
+
+### Conclusiones
+
+El taller queda preparado para ejecutar pruebas con Ollama local usando `llama3.2:3b`. La parte de instalacion y prueba del modelo ya esta validada. Queda pendiente completar la bitacora con resultados reales cuando la API este corriendo en `http://localhost:3001` y se ejecuten las pruebas RN1-RN8.
